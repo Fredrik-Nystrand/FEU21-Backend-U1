@@ -45,10 +45,16 @@ namespace backend.Controllers
         {
             try
             {
-                var statuses = new List<StatusEntity>();
+                var statuses = new List<StatusResponse>();
                 foreach (var status in await _context.Statuses.ToListAsync())
                 {
-                    statuses.Add(status);
+                    var statusResponse = new StatusResponse
+                    {
+                        Id = status.Id,
+                        Status = status.Status,
+                    };
+
+                    statuses.Add(statusResponse);
                 }
 
                 return new OkObjectResult(statuses);
@@ -64,7 +70,19 @@ namespace backend.Controllers
         {
             try
             {
-                return new OkObjectResult(await _context.Statuses.FindAsync(id));
+                var statusEntity = await _context.Statuses.FindAsync(id);
+
+                if (statusEntity == null)
+                {
+                    return new BadRequestObjectResult(new { message = "No status with id: " + id + " exists", error = "Could not get status with id: " + id });
+                }
+
+                var statusResponse = new StatusResponse
+                {
+                    Id = statusEntity.Id,
+                    Status = statusEntity.Status,
+                };
+                return new OkObjectResult(statusResponse);
             }
             catch (Exception e)
             {
@@ -75,10 +93,8 @@ namespace backend.Controllers
         [HttpPut]
         public async Task<IActionResult> Edit(StatusEntity req)
         {
-            
             try
             {
-
                 var statusEntity = await _context.Statuses.FindAsync(req.Id);
                 if (statusEntity == null)
                 {

@@ -48,7 +48,14 @@ namespace backend.Controllers
                 _context.Customers.Add(customerEntity);
                 await _context.SaveChangesAsync();
 
-                return new OkObjectResult(customerEntity);
+                return new OkObjectResult(new CustomerResponse
+                {
+                    Id = customerEntity.Id,
+                    Email = customerEntity.Email,
+                    FirstName = customerEntity.FirstName,
+                    LastName = customerEntity.LastName,
+                    PhoneNumber = customerEntity.PhoneNumber,
+                });
             }
             catch (Exception e)
             {
@@ -77,13 +84,75 @@ namespace backend.Controllers
                     return new BadRequestObjectResult(new { message = "Bad Credentials", error = "Could not login customer" });
                 }
 
-                return new OkObjectResult(new {customerId = customerEntity.Id});
+                return new OkObjectResult(new CustomerResponse
+                {
+                    Id = customerEntity.Id,
+                    Email = customerEntity.Email,
+                    FirstName = customerEntity.FirstName,
+                    LastName = customerEntity.LastName,
+                    PhoneNumber = customerEntity.PhoneNumber,
+                });
             }
             catch (Exception e)
             {
                 return new BadRequestObjectResult(new { message = e, error = "Could not login customer" });
             }
 
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var customers = new List<CustomerResponse>();
+                foreach (var customer in await _context.Customers.ToListAsync())
+                {
+                    var customerResponse = new CustomerResponse
+                    {
+                        Id = customer.Id,
+                        FirstName = customer.FirstName,
+                        LastName = customer.LastName,
+                        Email = customer.Email,
+                        PhoneNumber = customer.PhoneNumber
+                    };
+                    customers.Add(customerResponse);
+                }
+
+                return new OkObjectResult(customers);
+            }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(new { message = e, error = "Could not get all customers" });
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            try
+            {
+                var customerEntity = await _context.Customers.FindAsync(id);
+                if (customerEntity == null)
+                {
+                    return new BadRequestObjectResult(new { message = "No customer with id: " + id + " exists", error = "Could not get customer with id: " + id });
+                }
+
+                var customerResponse = new CustomerResponse
+                {
+                    Id = customerEntity.Id,
+                    FirstName = customerEntity.FirstName,
+                    LastName= customerEntity.LastName,
+                    Email= customerEntity.Email,
+                    PhoneNumber= customerEntity.PhoneNumber
+                };
+                return new OkObjectResult(customerResponse);
+
+            }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(new { message = e, error = "Could not find customer with id: " + id });
+            }
         }
 
 

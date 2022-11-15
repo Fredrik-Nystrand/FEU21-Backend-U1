@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using backend.Models.Issue;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace backend.Models.Status
 {
@@ -8,5 +10,8 @@ namespace backend.Models.Status
         public int Id { get; set; }
         [Required]
         public string Status { get; set; }
+
+        [JsonIgnore]
+        public ICollection<IssueEntity> Issues { get; set; }
     }
 }

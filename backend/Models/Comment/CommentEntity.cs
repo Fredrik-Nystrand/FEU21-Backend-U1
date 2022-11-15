@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using backend.Models.Customer;
+using backend.Models.Issue;
+using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace backend.Models.Comment
 {
@@ -12,5 +15,11 @@ namespace backend.Models.Comment
         public DateTime Created { get; set; }
         [Required]
         public int CustomerId { get; set; }
+        [Required]
+        public int IssueId { get; set; }
+        [JsonIgnore]
+        public IssueEntity Issue { get; set; }
+        [JsonIgnore]
+        public CustomerEntity Customer { get; set; }
     }
 }

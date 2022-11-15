@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using backend.Models.Comment;
+using backend.Models.Issue;
+using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace backend.Models.Customer
 {
@@ -16,8 +19,10 @@ namespace backend.Models.Customer
         public byte[] PasswordHash { get; set; }
         [Required]
         public byte[] PasswordSalt { get; set; }
-
-        public string PhoneNumber { get; set; }
-
+        public string PhoneNumber { get; set; } = null;
+        [JsonIgnore]
+        public ICollection<IssueEntity> Issues { get; set; }
+        [JsonIgnore]
+        public ICollection<CommentEntity> Comments { get; set; }
     }
 }

@@ -12,8 +12,8 @@ using backend.Contexts;
 namespace backend.Migrations
 {
     [DbContext(typeof(SqlContext))]
-    [Migration("20221113183102_added entities")]
-    partial class addedentities
+    [Migration("20221114090301_structure")]
+    partial class structure
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,12 +43,14 @@ namespace backend.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IssueEntityId")
+                    b.Property<int>("IssueId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IssueEntityId");
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("IssueId");
 
                     b.ToTable("Comments");
                 });
@@ -72,6 +74,14 @@ namespace backend.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
@@ -138,21 +148,33 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Comment.CommentEntity", b =>
                 {
-                    b.HasOne("backend.Models.Issue.IssueEntity", null)
+                    b.HasOne("backend.Models.Customer.CustomerEntity", "Customer")
                         .WithMany("Comments")
-                        .HasForeignKey("IssueEntityId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.Issue.IssueEntity", "Issue")
+                        .WithMany("Comments")
+                        .HasForeignKey("IssueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Issue");
                 });
 
             modelBuilder.Entity("backend.Models.Issue.IssueEntity", b =>
                 {
                     b.HasOne("backend.Models.Customer.CustomerEntity", "Customer")
-                        .WithMany()
+                        .WithMany("Issues")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("backend.Models.Status.StatusEntity", "Status")
-                        .WithMany()
+                        .WithMany("Issues")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -162,9 +184,21 @@ namespace backend.Migrations
                     b.Navigation("Status");
                 });
 
+            modelBuilder.Entity("backend.Models.Customer.CustomerEntity", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Issues");
+                });
+
             modelBuilder.Entity("backend.Models.Issue.IssueEntity", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("backend.Models.Status.StatusEntity", b =>
+                {
+                    b.Navigation("Issues");
                 });
 #pragma warning restore 612, 618
         }
