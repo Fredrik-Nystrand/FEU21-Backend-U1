@@ -29,7 +29,7 @@ namespace backend.Controllers
             {
                 if (await _context.Customers.AnyAsync(x => x.Email == req.Email))
                 {
-                    return new BadRequestObjectResult(new { message = "A customer with that email already exists", error = "Could not create customer" });
+                    return new BadRequestObjectResult(new ErrorHandler{ Message = "A customer with that email already exists", Error = "Could not create customer" });
                 }
 
                 var passwordGeneration = new passwordGeneration();
@@ -59,7 +59,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not create status" });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not create status" });
             }
 
         }
@@ -74,14 +74,14 @@ namespace backend.Controllers
 
                 if (customerEntity == null)
                 {
-                    return new BadRequestObjectResult(new { message = "Bad Credentials", error = "Could not login customer" });
+                    return new BadRequestObjectResult(new ErrorHandler { Message = "Bad Credentials", Error = "Could not login customer" });
                 }
 
                 var passwordGeneration = new passwordGeneration();
 
                 if (!passwordGeneration.ValidatePassword(req.Password, customerEntity.PasswordHash, customerEntity.PasswordSalt))
                 {
-                    return new BadRequestObjectResult(new { message = "Bad Credentials", error = "Could not login customer" });
+                    return new BadRequestObjectResult(new ErrorHandler { Message = "Bad Credentials", Error = "Could not login customer" });
                 }
 
                 return new OkObjectResult(new CustomerResponse
@@ -95,7 +95,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not login customer" });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not login customer" });
             }
 
         }
@@ -123,7 +123,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not get all customers" });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not get all customers" });
             }
         }
 
@@ -135,7 +135,7 @@ namespace backend.Controllers
                 var customerEntity = await _context.Customers.FindAsync(id);
                 if (customerEntity == null)
                 {
-                    return new BadRequestObjectResult(new { message = "No customer with id: " + id + " exists", error = "Could not get customer with id: " + id });
+                    return new BadRequestObjectResult(new ErrorHandler { Message = "No customer with id: " + id + " exists", Error = "Could not get customer with id: " + id });
                 }
 
                 var customerResponse = new CustomerResponse
@@ -151,7 +151,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not find customer with id: " + id });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not find customer with id: " + id });
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using backend.Contexts;
 using backend.Models.Status;
+using backend.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ namespace backend.Controllers
             {
                 if (await _context.Statuses.AnyAsync(x => x.Status == req.Status))
                 {
-                    return new BadRequestObjectResult(new { message = "A status with that name already exists", error = "Could not create status" });
+                    return new BadRequestObjectResult(new ErrorHandler { Message = "A status with that name already exists", Error = "Could not create status" });
                 }
 
                 var statusEntity = new StatusEntity { Status = req.Status };
@@ -35,7 +36,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not create status" });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not create status" });
             }
 
         }
@@ -61,7 +62,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not get all statuses" });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not get all statuses" });
             }
         }
 
@@ -74,7 +75,7 @@ namespace backend.Controllers
 
                 if (statusEntity == null)
                 {
-                    return new BadRequestObjectResult(new { message = "No status with id: " + id + " exists", error = "Could not get status with id: " + id });
+                    return new BadRequestObjectResult(new ErrorHandler { Message = "No status with id: " + id + " exists", Error = "Could not get status with id: " + id });
                 }
 
                 var statusResponse = new StatusResponse
@@ -86,7 +87,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not find status with id: " + id });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not find status with id: " + id });
             }
         }
 
@@ -98,7 +99,7 @@ namespace backend.Controllers
                 var statusEntity = await _context.Statuses.FindAsync(req.Id);
                 if (statusEntity == null)
                 {
-                    return new BadRequestObjectResult(new { message = "No status with id: " + req.Id + " exists", error = "Could not edit status with id: " + req.Id });
+                    return new BadRequestObjectResult(new ErrorHandler { Message = "No status with id: " + req.Id + " exists", Error = "Could not edit status with id: " + req.Id });
                 }
                 _context.ChangeTracker.Clear();
 
@@ -109,7 +110,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not edit status with id: " + req.Id});
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not edit status with id: " + req.Id});
             }
         }
 
@@ -119,7 +120,7 @@ namespace backend.Controllers
             var statusEntity = await _context.Statuses.FindAsync(id);
             if (statusEntity == null)
             {
-                return new BadRequestObjectResult(new { message = "No status with id: " + id + " exists", error = "Could not delete status with id: " + id });
+                return new BadRequestObjectResult(new ErrorHandler { Message = "No status with id: " + id + " exists", Error = "Could not delete status with id: " + id });
             }
 
             try
@@ -131,7 +132,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not delete status with id: " + id });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not delete status with id: " + id });
             }
         }
     }

@@ -3,6 +3,7 @@ using backend.Models.Comment;
 using backend.Models.Customer;
 using backend.Models.Issue;
 using backend.Models.Status;
+using backend.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,7 +44,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not create issue" });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not create issue" });
             }
         }
 
@@ -85,7 +86,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not get all the issues" });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not get all the issues" });
             }
         }
 
@@ -94,10 +95,10 @@ namespace backend.Controllers
         {
             try
             {
-                var issueEntity = await _context.Issues.Include(x => x.Status).Include(x => x.Customer).Include(x => x.Comments).FirstOrDefaultAsync(x => x.Id == id);
+                var issueEntity = await _context.Issues.Include(x => x.Status).Include(x => x.Customer).Include(x => x.Comments).ThenInclude(comment => comment.Customer).FirstOrDefaultAsync(x => x.Id == id);
                 if(issueEntity == null)
                 {
-                    return new BadRequestObjectResult(new { message = "No issue with the id " + id + " exists", error = "Could not get the issue with id: " + id });
+                    return new BadRequestObjectResult(new ErrorHandler { Message = "No issue with the id " + id + " exists", Error = "Could not get the issue with id: " + id });
                 }
 
                 var comments = new List<CommentResponse>();
@@ -109,7 +110,7 @@ namespace backend.Controllers
                         Comment = comment.Comment,
                         Created = comment.Created,
                         CustomerId = comment.Customer.Id,
-                        CustomerName = issueEntity.Customer.FirstName + " " + issueEntity.Customer.LastName,
+                        CustomerName = comment.Customer.FirstName + " " + comment.Customer.LastName,
                     };
 
                     comments.Add(commentResponse);
@@ -142,7 +143,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not get the issue with id: " + id });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not get the issue with id: " + id });
             }
         }
 
@@ -154,7 +155,7 @@ namespace backend.Controllers
                 var issueEntity = await _context.Issues.FindAsync(req.Id);
                 if (issueEntity == null)
                 {
-                    return new BadRequestObjectResult(new { message = "No issue with id: " + req.Id + " exists", error = "Could not edit issue with id: " + req.Id });
+                    return new BadRequestObjectResult(new ErrorHandler { Message = "No issue with id: " + req.Id + " exists", Error = "Could not edit issue with id: " + req.Id });
                 }
                 
 
@@ -178,7 +179,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not edit issue with id: " + req.Id });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not edit issue with id: " + req.Id });
             }
         }
     }

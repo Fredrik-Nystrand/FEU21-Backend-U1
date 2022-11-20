@@ -1,6 +1,7 @@
 ﻿using backend.Contexts;
 using backend.Models.Comment;
 using backend.Models.Status;
+using backend.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,7 +39,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new { message = e, error = "Could not create status" });
+                return new BadRequestObjectResult(new ErrorHandler { Message = e.Message, Error = "Could not create status" });
             }
 
         }
